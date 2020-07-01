@@ -1,0 +1,131 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 546
+  ClientWidth = 353
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object LayoutWorld: TLayout
+    Align = Client
+    Size.Width = 353.000000000000000000
+    Size.Height = 546.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    OnMouseDown = LayoutWorldMouseDown
+    object LayoutNesne: TLayout
+      Position.X = 8.000000000000000000
+      Position.Y = 232.000000000000000000
+      Size.Width = 50.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object Ellipse1: TEllipse
+        Fill.Color = claBrown
+        Locked = True
+        HitTest = False
+        Scale.X = 0.500000000000000000
+        Scale.Y = 0.500000000000000000
+        Size.Width = 65.000000000000000000
+        Size.Height = 25.000000000000000000
+        Size.PlatformDefault = False
+        object Ellipse2: TEllipse
+          Fill.Color = claBurlywood
+          Locked = True
+          HitTest = False
+          Position.X = 47.000000000000000000
+          Position.Y = -8.000000000000000000
+          Size.Width = 26.000000000000000000
+          Size.Height = 25.000000000000000000
+          Size.PlatformDefault = False
+          object Circle1: TCircle
+            Fill.Color = claBisque
+            Locked = True
+            HitTest = False
+            Position.X = -15.000000000000000000
+            Size.Width = 32.000000000000000000
+            Size.Height = 25.000000000000000000
+            Size.PlatformDefault = False
+            object Circle2: TCircle
+              Fill.Color = claBlack
+              Locked = True
+              HitTest = False
+              Position.X = 16.000000000000000000
+              Size.Width = 10.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+            end
+          end
+        end
+        object Pie1: TPie
+          Position.X = 8.000000000000000000
+          Position.Y = -16.000000000000000000
+          RotationAngle = 170.000000000000000000
+          Size.Width = 65.000000000000000000
+          Size.Height = 57.000000000000000000
+          Size.PlatformDefault = False
+          EndAngle = -90.000000000000000000
+          object FloatAnimationKanat: TFloatAnimation
+            AnimationType = InOut
+            AutoReverse = True
+            Duration = 0.200000002980232200
+            Interpolation = Sinusoidal
+            Loop = True
+            OnProcess = FloatAnimationKanatProcess
+            PropertyName = 'EndAngle'
+            StartValue = -90.000000000000000000
+            StopValue = 90.000000000000000000
+          end
+        end
+      end
+      object FloatAnimationDusmek: TFloatAnimation
+        Delay = 0.200000002980232200
+        Duration = 0.500000000000000000
+        PropertyName = 'RotationAngle'
+        StartValue = 0.000000000000000000
+        StartFromCurrent = True
+        StopValue = 100.000000000000000000
+      end
+      object FloatAnimationSinek: TFloatAnimation
+        Duration = 0.200000002980232200
+        OnFinish = FloatAnimationSinekFinish
+        PropertyName = 'Position.Y'
+        StartValue = 0.000000000000000000
+        StartFromCurrent = True
+        StopValue = 0.000000000000000000
+      end
+    end
+    object LayoutEngel: TLayout
+      Align = Vertical
+      Position.X = 248.000000000000000000
+      Size.Width = 41.000000000000000000
+      Size.Height = 546.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object Rectangle1: TRectangle
+        Align = Top
+        Fill.Color = claCornflowerblue
+        Locked = True
+        HitTest = False
+        Size.Width = 41.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+      end
+      object Rectangle2: TRectangle
+        Align = Bottom
+        Fill.Color = claCornflowerblue
+        Locked = True
+        HitTest = False
+        Position.Y = 496.000000000000000000
+        Size.Width = 41.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+      end
+    end
+  end
+end

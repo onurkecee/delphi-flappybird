@@ -1,0 +1,209 @@
+unit Unit1;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes,
+  System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Ani,
+  FMX.Objects, FMX.Layouts;
+
+type
+  TForm1 = class(TForm)
+    LayoutWorld: TLayout;
+    LayoutNesne: TLayout;
+    Ellipse1: TEllipse;
+    Ellipse2: TEllipse;
+    Circle1: TCircle;
+    Circle2: TCircle;
+    Pie1: TPie;
+    FloatAnimationKanat: TFloatAnimation;
+    LayoutEngel: TLayout;
+    Rectangle1: TRectangle;
+    Rectangle2: TRectangle;
+    FloatAnimationDusmek: TFloatAnimation;
+    FloatAnimationSinek: TFloatAnimation;
+    procedure FloatAnimationKanatProcess(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure LayoutWorldMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Single);
+    procedure FloatAnimationSinekFinish(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure Reset;
+    procedure YolYapimi(const aMaster: TLayout);
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.fmx}
+
+const
+  MaxAbstand: Single = 200;
+  MaxHinder: integer = 5;
+
+procedure TForm1.FloatAnimationSinekFinish(Sender: TObject);
+begin
+  FloatAnimationDusmek.Start;
+end;
+
+procedure TForm1.FloatAnimationKanatProcess(Sender: TObject);
+var
+  I, K: integer;
+  C: TLayout;
+  R: TRectF;
+begin
+  with LayoutNesne do
+  begin
+    if Position.X <> (LayoutWorld.Width - Width) * 0.5 then
+      Position.X := (LayoutWorld.Width - Width) * 0.5; // Ortayý Getir
+    if LayoutWorld.AbsoluteRect.Bottom > AbsoluteRect.Bottom then
+      Position.Y := Position.Y + RotationAngle * 0.1
+      // 0'dan sonra kilitlenme baþlat
+    else
+    begin
+     FloatAnimationKanat.StopAtCurrent;
+     GameOver;
+     Exit;
+    end;
+  end;
+
+  if not LayoutWorld.HitTest then // Týklanmazsa çýk
+    exit;
+
+  for I := 0 to LayoutWorld.ChildrenCount - 1 do
+  begin
+    if not(LayoutWorld.Children[I] is TLayout) then
+      Continue; // Tlayout'ta kontrol yoksa devam et
+    C := TLayout(LayoutWorld.Children[I]);
+    if C = LayoutNesne then
+      Continue; // nesne devam ederse
+
+    if C.Position.X + LayoutEngel.Width < 0 then
+    begin
+      C.Position.X := MaxHinder * (LayoutEngel.Width + MaxAbstand) -
+        LayoutNesne.Width; // en saðdaki yeni pozisyonnu hesapla
+      YolYapimi(C);
+    end
+    else
+    begin
+      C.Position.X := C.Position.X - 3; // sola hareket ettir
+    end;
+  end;
+
+end;
+
+procedure TForm1.FormCreate(Sender: TObject);
+var
+  P: Single;
+  C: TLayout;
+  I: integer;
+begin
+  LayoutWorld.HitTest := true;
+  LayoutWorld.Tag := 0;
+  LayoutWorld.Width; // Saða getir
+  LayoutEngel.Position.X := P;
+  for I := 2 to MaxHinder do // Maximum engeller.
+  begin
+    C := TLayout(LayoutEngel.Clone(LayoutWorld)); // Klon üret
+    P := P + LayoutEngel.Width + MaxAbstand; // pozisyonu hesapla
+    C.Position.X := P; // pozisyon ekle
+    LayoutWorld.AddObject(C); // Yeni engel ekleme
+  end;
+  TRectangle(C.Children[0]).Fill.Color := TAlphaColors.Orange;
+  // yukarýdaki son engeli iþaretlemek
+  TRectangle(C.Children[1]).Fill.Color := TAlphaColors.Orange;
+  // aþaðýdaki son engeli iþaretlemek
+  Reset;
+end;
+
+procedure TForm1.LayoutWorldMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Single);
+begin
+  if not FloatAnimationKanat.Running then
+    FloatAnimationKanat.Start; // motoru çalýþtýr.
+
+  FloatAnimationDusmek.StopAtCurrent; // Düþme yoksa
+  LayoutNesne.RotationAngle := -10; // Yukarý doðru fýrlatmak
+  FloatAnimationSinek.StopValue := LayoutNesne.Position.Y - LayoutNesne.Height *
+    3; // yeni pozisyonu yukarý doðru tanýmla
+  if FloatAnimationSinek.StopValue < LayoutNesne.Height then
+  begin
+    FloatAnimationSinek.StopValue := LayoutNesne.Height;
+    // Kenardan deðil(bende anlamadým)
+  end;
+  FloatAnimationSinek.Start;
+
+end;
+
+procedure TForm1.Reset;
+var
+  C: TLayout;
+  P: Single;
+  T: TPointF;
+  I: integer;
+begin
+  RandSeed := 342;
+  TagFloat := Random; // yüksekliðin ilk bölümünü tanýmlar.
+  P := LayoutWorld.Width; // dünyanýn en geniþ geniþliði
+  LayoutEngel.Position.X := P; // konumlandýrma
+
+  for I := 0 to LayoutWorld.ChildrenCount - 1 do
+  begin // Tüm engelleri sýfýrla
+    if not(LayoutWorld.Children[I] is TLayout) then
+      Continue; // TLayout hiçbir kontrolün kazanýlmamasý halinde devam et
+    C := TLayout(LayoutWorld.Children[I]);
+    if C = LayoutNesne then
+      Continue; // Nesne devam ederse
+    YolYapimi(C);
+    if C = LayoutEngel then
+      Continue; // Hazýr
+
+    P := P + LayoutEngel.Width + MaxAbstand;
+    C.Position.X := P;
+
+  end;
+
+  with LayoutWorld do
+    T := PointF(Width, Height); // boyut.boyut;
+  with LayoutNesne do
+    Position.Point := (T - PointF(Width, Height)) * 0.5; // Ortaya getir.
+
+  // Kuþu engellerin önüne getir.
+  LayoutNesne.RotationAngle := 0; // tekrar düzleþtir.
+  Pie1.EndAngle := -90; // baþlagýç pozisyonuna geri dönmek
+  LayoutNesne.BringToFront;
+
+end;
+
+procedure TForm1.YolYapimi(const aMaster: TLayout);
+var
+  H, M: TPointF;
+  R, E: Single;
+begin
+  H.X := LayoutWorld.Height;
+  H.Y := 2; // yukarý ve aþaðý standart yakýnlýk
+  M.X := LayoutNesne.Height * 6; // Çýkýþ kapýsý
+
+  E := M.X / H.X;
+  repeat
+    R := Random;
+  until ((TagFloat + E) > R) and ((TagFloat + -E) < R);
+  // yavaþ yavaþ hareket ettirmek
+
+  TagFloat := R; // bir sonraki tur için pay
+  M.Y := R * (H.X - M.X - 2 * H.Y); // Pay ile vardiya hesapla
+  with TRectangle(aMaster.Children[0]) do
+    Height := H.Y + M.Y; // Üst engel
+  with TRectangle(aMaster.Children[1]) do
+    Height := H.X - H.Y - M.Y - M.X; // alt engel
+
+  aMaster.Tag := 0;
+end;
+
+end.
